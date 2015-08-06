@@ -9,8 +9,13 @@ import scala.collection.JavaConverters._
  */
 class Checkout {
 
-  private def calculateCost(fruitItems: List[FruitItem] = List()): BigDecimal =
-    fruitItems.map(_.price).sum
+  private def calculateCost(fruitItems: List[FruitItem] = List()): BigDecimal = {
+    val apples = fruitItems.filter(f => f.isInstanceOf[Apple])
+    val oranges = fruitItems.filter(f => f.isInstanceOf[Orange])
+
+    applyBuyOneGetOneOffer(Option(apples).getOrElse(List())) +
+      applyThreeForTwoOffer(Option(oranges).getOrElse(List()))
+  }
 
 
   def checkoutStep1(fruits: List[String]): BigDecimal = {
@@ -28,5 +33,17 @@ class Checkout {
       })
       calculateCost(fruitItems.asScala.toList)
     }
+  }
+
+  private def applyBuyOneGetOneOffer(fruitItems: List[FruitItem] = List()): BigDecimal = {
+    if (!fruitItems.isEmpty)
+      ((fruitItems.size / 2) * fruitItems.head.price) + ((fruitItems.size % 2) * fruitItems.head.price)
+    else BigDecimal(0)
+  }
+
+  private def applyThreeForTwoOffer(fruitItems: List[FruitItem]= List()): BigDecimal = {
+    if (!fruitItems.isEmpty)
+      ((fruitItems.size / 3) * 2 * fruitItems.head.price) + ((fruitItems.size % 3) * fruitItems.head.price)
+    else BigDecimal(0)
   }
 }
